@@ -58,3 +58,6 @@ df.to_excel('EPL_df.xlsx', sheet_name='Dataframe')
 df.to_csv('EPL_df.csv', sep=',')
 scores.to_csv('scores.csv', sep=',')
 scores_perc.to_csv('scores_perc.csv', sep=',')
+
+d = pd.read_csv('EPL_Set.csv')
+d.to_csv('EPL_Set.csv',sep=',')
