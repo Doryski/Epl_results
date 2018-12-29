@@ -55,9 +55,6 @@ pyo.plot(fig, filename="Scores_nested.html", auto_open=True)
 pyo.plot(fig1, filename='Scores_stacked.html', auto_open=True)
 # ----------------------- saving dataframes -----------------
 df.to_excel('EPL_df.xlsx', sheet_name='Dataframe')
-df.to_csv('EPL_df.csv', sep=',')
-scores.to_csv('scores.csv', sep=',')
-scores_perc.to_csv('scores_perc.csv', sep=',')
-
-d = pd.read_csv('EPL_Set.csv')
-d.to_csv('EPL_Set.csv',sep=',')
+df.to_csv('EPL_df.csv', index=False)
+scores.to_csv('scores.csv')
+scores_perc.to_csv('scores_perc.csv')
