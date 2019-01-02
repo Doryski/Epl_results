@@ -32,18 +32,15 @@ scores_perc['X'] = [round(scores_perc['X'][i]/np.sum(scores_perc['X'])*100, 1) f
 scores_perc['2'] = [round(scores_perc['2'][i]/np.sum(scores_perc['2'])*100, 1) for i in scores_perc.index]
 # -------------- plotly visualization --------------------
 trace0 = go.Bar(x=scores_perc.index, y=scores_perc['1'],
-                name='Home team win', marker=dict(color='green'))
+                name='Home team win', marker=dict(color='green'), width=0.25)
 trace1 = go.Bar(x=scores_perc.index, y=scores_perc['X'],
-                name='Draw', marker=dict(color='grey'))
+                name='Draw', marker=dict(color='grey'), width=0.25)
 trace2 = go.Bar(x=scores_perc.index, y=scores_perc['2'],
-                name='Away team win', marker=dict(color='blue'))
+                name='Away team win', marker=dict(color='blue'), width=0.25)
 data = [trace0, trace1, trace2]
 layout = go.Layout(title='Scores', yaxis=dict(title='%'), barmode=None)
-layout1 = go.Layout(title='Scores', yaxis=dict(title='%'), barmode='stack')
 fig = go.Figure(data=data, layout=layout)
-fig1 = go.Figure(data=data, layout=layout1)
 pyo.plot(fig, filename="Scores_nested.html", auto_open=True)
-pyo.plot(fig1, filename='Scores_stacked.html', auto_open=True)
 
 # ------------------- heatmap full time goals ------------------
 df_heatmap = pd.pivot_table(data=df, index='FTHG',columns='FTAG',values='FTR', aggfunc=lambda x: round(x.count()/len(df)*100, 1), fill_value=0.0)
@@ -78,6 +75,66 @@ data = [trace0, trace1, trace2]
 layout = go.Layout(title='Sum of goals distribution', yaxis=dict(title='%'), legend=dict(x=0.8, y=0.95))
 fig = go.Figure(data=data, layout=layout)
 pyo.plot(fig, filename="Sum_goals_dist.html", auto_open=True)
+# ----------------------- bar plot sums of goals -----------------
+result_comparison = pd.DataFrame(df['HalfTvsFullT'].value_counts())
+result_comparison = result_comparison.apply(lambda x: round(x/len(df)*100,1))
+import squarify
+x = 0.
+y = 0.
+width = 100.
+height = 100.
+values = result_comparison['HalfTvsFullT']
+color_brewer = ['blue','blue','blue','green','green','green','green', 'grey', 'grey']
+normed = squarify.normalize_sizes(values, width, height)
+rects = squarify.squarify(normed, x, y, width, height)
+shapes = []
+annotations = []
+counter = 0
+
+for r in rects:
+    shapes.append(
+        dict(
+            type = 'rect',
+            x0 = r['x'],
+            y0 = r['y'],
+            x1 = r['x']+r['dx'],
+            y1 = r['y']+r['dy'],
+            line = dict(width=2, color='white'),
+            fillcolor = color_brewer[counter]
+        )
+    )
+    annotations.append(
+        dict(
+            x = r['x']+(r['dx']/2),
+            y = r['y']+(r['dy']/2),
+            text = values.index[counter] + ': ' + str(values[counter]) + '%',
+            showarrow = False,
+            font = dict(
+                color = "black",
+                size = 12
+        )
+    ))
+    counter = counter + 1
+    if counter >= len(color_brewer):
+        counter = 0
+trace0 = go.Scatter(
+    x = [ r['x']+(r['dx']/2) for r in rects ],
+    y = [ r['y']+(r['dy']/2) for r in rects ]
+)
+
+layout = go.Layout(
+    height=700,
+    width=700,
+    xaxis=dict(showgrid=False,zeroline=False, showticklabels=False),
+    yaxis=dict(showgrid=False,zeroline=False, showticklabels=False),
+    shapes=shapes,
+    annotations=annotations,
+    hovermode='closest', title='Half time result vs Full time result distribution'
+)
+
+# With hovertext
+fig = dict(data=[trace0], layout=layout)
+pyo.plot(fig, filename="Half_goals.html", auto_open=True)
 # ----------------------- saving dataframes -----------------
 df.to_excel('EPL_df.xlsx', sheet_name='Dataframe')
 df.to_csv('EPL_df.csv', index=False)
