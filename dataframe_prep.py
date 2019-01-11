@@ -135,6 +135,7 @@ layout = go.Layout(
 # With hovertext
 fig = dict(data=[trace0], layout=layout)
 pyo.plot(fig, filename="Half_goals.html", auto_open=True)
+
 # ----------------------- saving dataframes -----------------
 df.to_excel('EPL_df.xlsx', sheet_name='Dataframe')
 df.to_csv('EPL_df.csv', index=False)
